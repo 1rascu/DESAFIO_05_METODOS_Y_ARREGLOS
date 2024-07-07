@@ -1,0 +1,10 @@
+body{
+    background-color: rgb(173, 184, 148);
+}
+
+.btn_eliminar_tarea{
+    display: block;
+    width: 20px;
+    height: 20px; 
+    text-align: center;
+}

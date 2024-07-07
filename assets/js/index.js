@@ -1,97 +1,83 @@
-window.onload = () => {
-    const form1 = document.querySelector("#addForm");
+const nuevaTarea = document.querySelector('#nuevaTarea')
+const total = document.querySelector('#Total')
+const realizados = document.querySelector('#Realizadas')
+const filas = document.querySelector('#Filas')
+const btnAgregar = document.querySelector('#Agregar')
 
-    let items = document.getElementById("items");
-    let submit = document.getElementById("submit");
-
-    let editItem = null;
-
-    form1.addEventListener("submit", addItem);
-    items.addEventListener("click", removeItem);
-};
-
-function addItem(e) {
-    e.preventDefault();
-
-    if (submit.value != "Submit") {
-        console.log("Hello");
-
-        editItem.target.parentNode.childNodes[0].data
-            = document.getElementById("item").value;
-
-        submit.value = "Submit";
-        document.getElementById("item").value = "";
-
-        document.getElementById("lblsuccess").innerHTML
-            = "Text edited successfully";
-
-        document.getElementById("lblsuccess")
-                        .style.display = "block";
-
-        setTimeout(function() {
-            document.getElementById("lblsuccess")
-                            .style.display = "none";
-        }, 3000);
-
-        return false;
+const listadoTareas = [
+    {
+        id:1,
+        tarea: 'EJEMPLO 1',
+        estado: false
+    },
+    {
+        id:12,
+        tarea: 'EJEMPLO 2',
+        estado: true
+    },
+    {
+        id:12,
+        tarea: 'EJEMPLO 3',
+        estado: false
     }
-
-    let newItem = document.getElementById("item").value;
-    if (newItem.trim() == "" || newItem.trim() == null)
-        return false;
-    else
-        document.getElementById("item").value = "";
-
-    let li = document.createElement("li");
-    li.className = "list-group-item";
-
-    let deleteButton = document.createElement("button");
-
-    deleteButton.className = 
-        "btn-danger btn btn-sm float-right delete";
-
-    deleteButton.appendChild(document.createTextNode("Delete"));
-
-    let editButton = document.createElement("button");
-
-    editButton.className = 
-            "btn-success btn btn-sm float-right edit";
-
-    editButton.appendChild(document.createTextNode("Edit"));
-
-    li.appendChild(document.createTextNode(newItem));
-    li.appendChild(deleteButton);
-    li.appendChild(editButton);
-
-    items.appendChild(li);
+]
+function conteo(){
+    const conteo = listadoTareas.filter(tarea => tarea.estado === true).length
+    realizados.innerHTML = conteo
+}
+function Total() {
+    let contador = listadoTareas.length
+    total.innerHTML = contador
 }
 
-function removeItem(e) {
-    e.preventDefault();
-    if (e.target.classList.contains("delete")) {
-        if (confirm("Are you Sure?")) {
-            let li = e.target.parentNode;
-            items.removeChild(li);
-            document.getElementById("lblsuccess").innerHTML
-                = "Text deleted successfully";
+RenderListadoTareas = () =>{
+    let html = ''
+    for (let listado of listadoTareas){
+        html += `<div class="col-3 text-center" style="color: ${listado.estado ? 'green; text-decoration:line-through;'  : 'black'};">
+                <strong>${listado.id}</strong> 
+            </div>
+            <div class="col-3" style="color: ${listado.estado ? 'green ; text-decoration:line-through;' : 'black'};">
+                ${listado.tarea}
+            </div>
+            <div class="col-1">
+                <input type="checkbox" ${listado.estado ? 'checked' : ''} onchange="ActualizarEstado(${listado.id}, this.checked)">
+            </div>
+            <div class="col-3">
+                <img class="btn_eliminar_tarea" src="./assets/img/btn_cancelar.png" alt="imagen deeliminar" onclick="Borrar(${listado.id})">
 
-            document.getElementById("lblsuccess")
-                        .style.display = "block";
-
-            setTimeout(function() {
-                document.getElementById("lblsuccess")
-                        .style.display = "none";
-            }, 3000);
-        }
-    }
-    if (e.target.classList.contains("edit")) {
-        document.getElementById("item").value =
-            e.target.parentNode.childNodes[0].data;
-        submit.value = "EDIT";
-        editItem = e;
-    }
+            </div>`   
+}filas.innerHTML = html
+Total()
+conteo()
 }
 
-function toggleButton(ref, btnID) {
-    document.getElementById(btnID).disabled = false;
+RenderListadoTareas()
+
+btnAgregar.addEventListener('click',()=>{
+    if (nuevaTarea.value.trim() === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Error',
+            text: '¡No, se puede guardar una tarea sin datos!',
+        });
+    } else {
+    tarea = {id:Date.now(),tarea:nuevaTarea.value,estado:false}
+    listadoTareas.push(tarea)
+    nuevaTarea.value = ''
+    RenderListadoTareas()
+}})
+
+function Borrar(id){
+    const index = listadoTareas.findIndex(tarea => tarea.id === id)
+    listadoTareas.splice(index,1)
+    RenderListadoTareas()
 }
+
+
+
+function ActualizarEstado(id,estado){
+    const index = listadoTareas.findIndex(tarea => tarea.id === id)
+    listadoTareas[index].estado = estado
+    RenderListadoTareas()
+}
+
